@@ -187,11 +187,24 @@ public class PluginArena extends BukkitRunnable implements IPluginArena {
     this.ready = ready;
   }
 
+  private void throwPlayersIntoArena() {
+    if(!plugin.getArenaManager().isAutoJoinEnabled()) {
+      return;
+    }
+
+    Set<Player> players = new HashSet<>(this.getPlayers());
+    for(Player player : Bukkit.getOnlinePlayers()) {
+      if(!players.contains(player)) {
+        plugin.getArenaManager().joinAttempt(player, this);
+      }
+    }
+  }
 
   @Override
   public void run() {
     //idle task
     if (iArenaState == iArenaState.WAITING_FOR_PLAYERS && players.isEmpty()) {
+      throwPlayersIntoArena();
       return;
     }
     plugin.getDebugger().performance("ArenaTask", "[PerformanceMonitor] [{0}] Running game task", id);
@@ -207,6 +220,11 @@ public class PluginArena extends BukkitRunnable implements IPluginArena {
       arenaStateHandler = gameStateHandlers.get(iArenaState);
     }
     arenaStateHandler.handleCall(this);
+
+    if(arenaStateHandler instanceof PluginWaitingState) {
+      throwPlayersIntoArena();
+    }
+
     plugin.getDebugger().performance("ArenaUpdate", "Arena {0} Got from handler {1} and {2}, current {3}", getId(), arenaStateHandler.getArenaTimer(), arenaStateHandler.getArenaStateChange(), iArenaState);
     if (!forceArenaTimer && arenaStateHandler.getArenaTimer() != -999) {
       plugin.getDebugger().performance("ArenaUpdate", "Arena {0} Changed ArenaTimer to {1} from handler", getId(), arenaStateHandler.getArenaTimer());

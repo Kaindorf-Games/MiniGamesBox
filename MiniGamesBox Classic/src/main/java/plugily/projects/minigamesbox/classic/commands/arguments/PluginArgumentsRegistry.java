@@ -86,6 +86,7 @@ public class PluginArgumentsRegistry implements CommandExecutor {
     new ForceStartArgument(this);
     new ReloadArgument(this);
     new StopArgument(this);
+    new DisableAutoJoinArgument(this);
 
     //player statistic related arguments
     new AdjustStatisticArgument(this);

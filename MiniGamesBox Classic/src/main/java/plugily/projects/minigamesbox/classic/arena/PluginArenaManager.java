@@ -48,6 +48,7 @@ import java.util.logging.Level;
 public class PluginArenaManager {
 
   private final PluginMain plugin;
+  private boolean autoJoinEnabled = false;
 
   public PluginArenaManager(PluginMain plugin) {
     this.plugin = plugin;
@@ -311,4 +312,11 @@ public class PluginArenaManager {
     }.runTaskTimer(plugin, 30, 30);
   }
 
+  public void switchAutoJoinEnabled() {
+    autoJoinEnabled = !autoJoinEnabled;
+  }
+
+  public boolean isAutoJoinEnabled() {
+    return autoJoinEnabled;
+  }
 }

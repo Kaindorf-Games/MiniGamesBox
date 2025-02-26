@@ -19,6 +19,7 @@ package plugily.projects.minigamesbox.classic.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,6 +30,8 @@ import plugily.projects.minigamesbox.classic.handlers.items.SpecialItem;
 import plugily.projects.minigamesbox.classic.utils.serialization.InventorySerializer;
 import plugily.projects.minigamesbox.classic.utils.services.UpdateChecker;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
+
+import java.util.Optional;
 
 /**
  * @author Tigerpanzer_02
@@ -46,11 +49,9 @@ public class JoinEvent implements Listener {
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
-    IPluginArena arena = plugin.getUserManager().getUsersQuitDuringGame().get(event.getPlayer().getUniqueId());
-    if(arena != null) {
-      VersionUtils.teleport(event.getPlayer(), arena.getEndLocation());
-      plugin.getUserManager().getUsersQuitDuringGame().remove(event.getPlayer().getUniqueId());
-    }
+    Optional<Location> arenaEndLocation = plugin.getArenaRegistry().getArenas().stream().map(IPluginArena::getEndLocation).findFirst();
+    arenaEndLocation.ifPresent(location -> VersionUtils.teleport(event.getPlayer(), location));
+
     plugin.getUserManager().loadStatistics(plugin.getUserManager().getUser(event.getPlayer()));
     //load player inventory in case of server crash, file is deleted once loaded so if file was already
     //deleted player won't receive his backup, in case of crash he will get it back
