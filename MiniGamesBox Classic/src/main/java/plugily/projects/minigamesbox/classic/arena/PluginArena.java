@@ -194,7 +194,7 @@ public class PluginArena extends BukkitRunnable implements IPluginArena {
 
     Set<Player> players = new HashSet<>(this.getPlayers());
     for(Player player : Bukkit.getOnlinePlayers()) {
-      if(!players.contains(player)) {
+      if(players.stream().noneMatch(p -> p.getUniqueId().equals(player.getUniqueId()))) {
         plugin.getArenaManager().joinAttempt(player, this);
       }
     }
@@ -221,7 +221,7 @@ public class PluginArena extends BukkitRunnable implements IPluginArena {
     }
     arenaStateHandler.handleCall(this);
 
-    if(arenaStateHandler instanceof PluginWaitingState) {
+    if(arenaStateHandler instanceof PluginWaitingState || arenaStateHandler instanceof PluginStartingState) {
       throwPlayersIntoArena();
     }
 
